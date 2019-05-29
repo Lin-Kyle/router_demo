@@ -1,0 +1,20 @@
+// @import '~antd/dist/antd.css';
+
+html {
+  background-color: #666;
+
+  p {
+    color: red;
+  }
+
+  .img1,
+  .img2 {
+    width: 250px;
+    height: 400px;
+  }
+
+  .img2 {
+    background: url("../img/2.jpg") no-repeat center center;
+    background-size: cover;
+  }
+}
