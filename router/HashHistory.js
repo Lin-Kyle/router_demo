@@ -1,41 +1,50 @@
 export default class HashHistory {
   constructor(router, options) {
     this.router = router
-    this.viewChange = this.viewChange.bind(this)
-    window.addEventListener('load', () => {
-      if (!location.hash || !this.router._cache[location.hash.slice(1)]) {
-        location.hash = this.router._defaultRouter
-      } else {
-        this.viewChange()
-      }
-    })
-    window.addEventListener('hashchange', this.viewChange)
+    this.onComplete = null
+    // 监听事件
+    window.addEventListener('load', this.onChange)
+    window.addEventListener('hashchange', this.onChange)
   }
 
-  viewChange() {
-    this.router._wrapper.innerHTML = this.router._cache[location.hash.slice(1)]
+  onChange = () => {
+    // 匹配失败重定向
+    if (!location.hash || !this.router._cache[location.hash.slice(1)]) {
+      window.location.hash = this.router._defaultRouter
+    } else {
+      // 渲染视图
+      this.router._wrapper.innerHTML = this.router._cache[location.hash.slice(1)]
+      this.onComplete && this.onComplete() && (this.onComplete = null)
+    }
   }
 
-  go(url) {
-    location.hash = `${url}`
+  push(url, onComplete) {
+    window.location.hash = `${url}`
+    onComplete && (this.onComplete = onComplete)
   }
 
-  back() {
-    history.go(-1)
+  replace(url, onComplete) {
+    // 优雅降级
+    if (this.router._supportsReplaceState) {
+      window.location.hash = `${url}`
+      window.history.replaceState(null, null, `${window.location.origin}#${url}`)
+    } else {
+      // 需要先看看当前URL是否已经有hash值
+      const href = location.href
+      const index = href.indexOf('#')
+      url = index > 0
+        ? `${href.slice(0, index)}#${url}`
+        : `${href}#${url}`
+      // 域名不变的情况下不会刷新页面
+      window.location.replace(url)
+    }
+
+    onComplete && (this.onComplete = onComplete)
   }
 
-  redirect(url, content) {
-    // 需要先看看当前URL是否已经有hash值
-    const href = location.href
-    const index = href.indexOf('#')
-    url = index > 0
-      ? `${href.slice(0, index)}#${url}`
-      : `${href}#${url}`
-    location.replace(url)
-  }
-
+  // 移除事件
   stop() {
-    window.removeEventListener('load', this.viewChange)
-    window.removeEventListener('hashchange', this.viewChange)
+    window.removeEventListener('load', this.onChange)
+    window.removeEventListener('hashchange', this.onChange)
   }
 }

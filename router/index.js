@@ -7,29 +7,43 @@ export default class Router {
     if (!this._wrapper) {
       throw new Error(`你需要提供一个容器元素插入`)
     }
+    // 是否支持HTML5 History 模式
+    this._supportsReplaceState = window.history && typeof window.history.replaceState === 'function'
+    // 匹配路径
     this._cache = {}
+    // 默认路由
     this._defaultRouter = options.routes[0].path
     this.route(options.routes)
-    this._history = mode === 'hash' ? new HashHstory(this, options) : new Html5History({ wrapper: this.wrapper, cache: this.cache, defaultRouter: this.defaultRouter })
+    // 启用模式
+    this._history = (mode !== 'hash' && this._supportsReplaceState) ? new Html5History(this, options) : new HashHstory(this, options)
   }
 
+  // 添加路由
   route(routes) {
     routes.forEach(item => this._cache[item.path] = item.component)
   }
 
-  go(url, content) {
-    this._history.go(url, content)
+  // 原生浏览器前进
+  go(n = 1) {
+    window.history.go(n)
   }
 
-  back() {
-    this._history.back()
+  // 原生浏览器后退
+  back(n = -1) {
+    window.history.go(n)
   }
 
-
-  redirect(url, content) {
-    this._history.redirect(url, content)
+  // 增加
+  push(url, onComplete) {
+    this._history.push(url, onComplete)
   }
 
+  // 替换
+  replace(url, onComplete) {
+    this._history.replace(url, onComplete)
+  }
+
+  // 移除事件
   stop() {
     this._history.stop()
   }

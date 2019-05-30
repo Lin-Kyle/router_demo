@@ -16,4 +16,4 @@ window.router = new Router('view', {
     },
     { path: '*', redirect: '/index' }
   ]
-}, 'hash')
+}, 'hash')// 或者'html5'

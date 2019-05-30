@@ -1,16 +1,17 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>webpack + React</title>
+		<title>router</title>
 	</head>
 
 	<body>
 		<ul>
-			<li onclick="router.go('/a')">go a</li>
-			<li onclick="router.go('/b')">go b</li>
-			<li onclick="router.redirect('/c')">redirect c</li>
-			<li onclick="router.back()">back</li>
-			<li onclick="router.stop()">stop</li>
+			<li onclick="router.push('/a', ()=>console.log('push a'))">push a</li>
+			<li onclick="router.push('/b', ()=>console.log('push b'))">push b</li>
+			<li onclick="router.replace('/c', ()=>console.log('replace c'))">replace c</li>
+			<li onclick="router.go(1)">go</li>
+			<li onclick="router.back(-1)">back</li>
+			<li onclick="router.stop()">stop</li> 
 		</ul>
 		<div id="view"></div>
 	</body>
